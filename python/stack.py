@@ -41,6 +41,6 @@ def evaluate_postfix(expression):
 
 
 if __name__ == "__main__":
-    postfix_expression = "4 5 * +"
+    postfix_expression = "4 5 2 + *"
     result = evaluate_postfix(postfix_expression)
     print("Result of evaluating postfix expression {}: {}".format(postfix_expression, result))
