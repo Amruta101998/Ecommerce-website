@@ -1,0 +1,48 @@
+QA DOCUMENTATION VALIDATION REPORT
+======================================================================
+
+JIRA Reference: https://bito.atlassian.net/browse/BITO-12071
+Confluence Reference: https://bito.atlassian.net/wiki/spaces/EN/pages/1132003418/Quality+Assurance+QA
+Generated: 2026-02-03
+
+
+----------------------------------------------------------------------
+Requirement: REQ-001 - Login Validation
+Status: MATCH
+Severity: MEDIUM
+Notes: Both JIRA and Confluence are in complete agreement on login validation requirements.
+
+----------------------------------------------------------------------
+Requirement: REQ-002 - Password Policy Requirements
+Status: CONFLICT
+Severity: CRITICAL
+Notes: CRITICAL SECURITY MISMATCH: JIRA requires 12-character minimum while Confluence specifies 8 characters. JIRA requirement is more secure and should be enforced. This represents a significant security vulnerability if not resolved.
+Recommendation: Adopt JIRA's 12-character minimum requirement. Update Confluence documentation immediately.
+
+----------------------------------------------------------------------
+Requirement: REQ-003 - API Response Performance
+Status: PARTIAL_MATCH
+Severity: HIGH
+Notes: JIRA provides detailed performance SLA (2 seconds, P95/P99 targets, 100 concurrent users), but Confluence only mentions 'performance testing' without specific metrics. Implementation team will need clarification on acceptance criteria.
+Recommendation: Update Confluence with specific performance SLA metrics from JIRA. Define clear acceptance criteria for load testing.
+
+----------------------------------------------------------------------
+Requirement: REQ-004 - Session Timeout Configuration
+Status: MATCH
+Severity: MEDIUM
+Notes: Both sources align on session timeout (30 min), warning (25 min), and extension capability. Minor difference: JIRA specifies 15-minute extension duration which Confluence doesn't mention, but this is a reasonable implementation detail.
+
+----------------------------------------------------------------------
+Requirement: REQ-005 - Data Encryption in Transit
+Status: PARTIAL_MATCH
+Severity: MEDIUM
+Notes: Both require encryption in transit, but JIRA provides detailed specifications (TLS 1.2+, ECDHE, HSTS, certificate validation) while Confluence only mentions 'HTTPS'. Implementation needs to follow JIRA's detailed requirements.
+Recommendation: Update Confluence with specific TLS version, cipher suite, and HSTS requirements from JIRA. Add certificate validation requirements.
+
+======================================================================
+SUMMARY
+======================================================================
+Total Requirements: 5
+Fully Matched: 2 (40%)
+Partially Matched: 2 (40%)
+Conflicts: 1 (20%)

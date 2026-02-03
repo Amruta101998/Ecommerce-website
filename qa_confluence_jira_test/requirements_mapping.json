@@ -1,0 +1,142 @@
+{
+  "metadata": {
+    "jira_link": "https://bito.atlassian.net/browse/BITO-12071",
+    "confluence_link": "https://bito.atlassian.net/wiki/spaces/EN/pages/1132003418/Quality+Assurance+QA",
+    "last_updated": "2026-02-03",
+    "version": "1.0.0",
+    "purpose": "QA Documentation Validation - JIRA vs Confluence Alignment Test"
+  },
+  "requirements": [
+    {
+      "id": "REQ-001",
+      "category": "Authentication",
+      "name": "Login Validation",
+      "jira_specification": {
+        "source": "BITO-12071",
+        "details": "User login endpoint must return HTTP 200 on successful authentication and HTTP 401 for invalid credentials. Must validate username and password against secure database with proper error handling.",
+        "status_code_success": 200,
+        "status_code_failure": 401,
+        "error_handling": "Detailed error messages for invalid credentials"
+      },
+      "confluence_specification": {
+        "source": "Quality Assurance QA",
+        "details": "Login validation requires HTTP 200 for valid credentials and HTTP 401 for invalid credentials. Error handling must be implemented for invalid username or password.",
+        "status_code_success": 200,
+        "status_code_failure": 401,
+        "error_handling": "Error messages for invalid credentials"
+      },
+      "alignment_status": "MATCH",
+      "confidence": 100,
+      "notes": "Both JIRA and Confluence are in complete agreement on login validation requirements."
+    },
+    {
+      "id": "REQ-002",
+      "category": "Security",
+      "name": "Password Policy Requirements",
+      "jira_specification": {
+        "source": "BITO-12071",
+        "details": "Password must meet minimum length requirement of 12 characters. Must include uppercase, lowercase, numbers, and special characters. Passwords must be hashed using bcrypt with salt.",
+        "min_length": 12,
+        "complexity": "Uppercase, lowercase, numbers, special characters required",
+        "hashing_algorithm": "bcrypt with salt"
+      },
+      "confluence_specification": {
+        "source": "Quality Assurance QA",
+        "details": "Password minimum length requirement is 8 characters. Must include letters and numbers. Standard encryption required.",
+        "min_length": 8,
+        "complexity": "Letters and numbers required",
+        "hashing_algorithm": "Standard encryption"
+      },
+      "alignment_status": "CONFLICT",
+      "confidence": 100,
+      "severity": "CRITICAL",
+      "notes": "CRITICAL SECURITY MISMATCH: JIRA requires 12-character minimum while Confluence specifies 8 characters. JIRA requirement is more secure and should be enforced. This represents a significant security vulnerability if not resolved.",
+      "recommendation": "Adopt JIRA's 12-character minimum requirement. Update Confluence documentation immediately."
+    },
+    {
+      "id": "REQ-003",
+      "category": "Performance",
+      "name": "API Response Performance",
+      "jira_specification": {
+        "source": "BITO-12071",
+        "details": "API endpoints must respond within 2 seconds under normal load conditions (defined as 100 concurrent users). Performance testing required for all critical endpoints. Response time SLA: P95 < 2000ms, P99 < 3000ms.",
+        "response_time_sla": "< 2 seconds",
+        "load_test_users": 100,
+        "p95_target": "< 2000ms",
+        "p99_target": "< 3000ms"
+      },
+      "confluence_specification": {
+        "source": "Quality Assurance QA",
+        "details": "Performance testing should be conducted for API endpoints. Response times should be optimized for user experience.",
+        "response_time_sla": "Not specified",
+        "load_test_users": "Not specified",
+        "performance_testing": "Mentioned but not detailed"
+      },
+      "alignment_status": "PARTIAL_MATCH",
+      "confidence": 60,
+      "severity": "HIGH",
+      "notes": "JIRA provides detailed performance SLA (2 seconds, P95/P99 targets, 100 concurrent users), but Confluence only mentions 'performance testing' without specific metrics. Implementation team will need clarification on acceptance criteria.",
+      "recommendation": "Update Confluence with specific performance SLA metrics from JIRA. Define clear acceptance criteria for load testing."
+    },
+    {
+      "id": "REQ-004",
+      "category": "Configuration",
+      "name": "Session Timeout Configuration",
+      "jira_specification": {
+        "source": "BITO-12071",
+        "details": "User sessions must expire after 30 minutes of inactivity. System must display warning message at 25 minutes. User can extend session by 15 minutes with one click. Session data must be securely stored.",
+        "timeout_duration": "30 minutes",
+        "warning_duration": "25 minutes",
+        "extension_duration": "15 minutes",
+        "storage": "Secure session storage"
+      },
+      "confluence_specification": {
+        "source": "Quality Assurance QA",
+        "details": "Session timeout is configured to 30 minutes of inactivity. Users receive a warning notification at 25 minutes before session expires. Session extension capability available.",
+        "timeout_duration": "30 minutes",
+        "warning_duration": "25 minutes",
+        "extension_capability": "Available"
+      },
+      "alignment_status": "MATCH",
+      "confidence": 95,
+      "notes": "Both sources align on session timeout (30 min), warning (25 min), and extension capability. Minor difference: JIRA specifies 15-minute extension duration which Confluence doesn't mention, but this is a reasonable implementation detail."
+    },
+    {
+      "id": "REQ-005",
+      "category": "Security",
+      "name": "Data Encryption in Transit",
+      "jira_specification": {
+        "source": "BITO-12071",
+        "details": "All data transmission must use TLS 1.2 or higher. Certificate validation required. Must support ECDHE cipher suites for forward secrecy. Implement HSTS with max-age of 31536000 seconds.",
+        "protocol": "TLS 1.2+",
+        "certificate_validation": "Required",
+        "cipher_suites": "ECDHE required",
+        "hsts_max_age": "31536000 seconds"
+      },
+      "confluence_specification": {
+        "source": "Quality Assurance QA",
+        "details": "Data encryption in transit must be implemented. HTTPS should be used for all communications.",
+        "protocol": "HTTPS (TLS version not specified)",
+        "certificate_validation": "Not specified",
+        "cipher_suites": "Not specified"
+      },
+      "alignment_status": "PARTIAL_MATCH",
+      "confidence": 55,
+      "severity": "MEDIUM",
+      "notes": "Both require encryption in transit, but JIRA provides detailed specifications (TLS 1.2+, ECDHE, HSTS, certificate validation) while Confluence only mentions 'HTTPS'. Implementation needs to follow JIRA's detailed requirements.",
+      "recommendation": "Update Confluence with specific TLS version, cipher suite, and HSTS requirements from JIRA. Add certificate validation requirements."
+    }
+  ],
+  "summary": {
+    "total_requirements": 5,
+    "fully_matched": 2,
+    "partially_matched": 2,
+    "conflicts": 1,
+    "match_percentage": 40,
+    "partial_match_percentage": 40,
+    "conflict_percentage": 20,
+    "critical_issues": 1,
+    "high_priority_issues": 1,
+    "action_required": true
+  }
+}
