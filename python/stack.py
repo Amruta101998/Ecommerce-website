@@ -34,6 +34,8 @@ def evaluate_postfix(expression):
         elif char in operators:
             operand2 = stack.pop()
             operand1 = stack.pop()
+            if char == '/' and operand2 == 0:
+                raise ValueError("Division by zero")
             result = operators[char](operand1, operand2)
             stack.push(result)
         else:
