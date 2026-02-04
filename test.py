@@ -57,8 +57,11 @@ def validate_input(func):
         for arg in args:
             if isinstance(arg, (int, float, complex)):
                 continue
-            if isinstance(arg, str) and not arg.replace('.', '').replace('-', '').isdigit():
-                return "Error: Invalid input type"
+            if isinstance(arg, str):
+                try:
+                    float(arg)
+                except ValueError:
+                    return "Error: Invalid input type"
         return func(*args, **kwargs)
     return wrapper
 
