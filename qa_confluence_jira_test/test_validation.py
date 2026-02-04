@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 """
 QA Documentation Validation Test Suite
 Validates alignment between JIRA and Confluence requirements
@@ -10,6 +11,14 @@ This script parses requirements_mapping.json and identifies:
 
 JIRA Reference: https://bito.atlassian.net/browse/BITO-12071
 Confluence Reference: https://bito.atlassian.net/wiki/spaces/EN/pages/1132003418/Quality+Assurance+QA
+
+Conflict Types:
+- JIRA_UPDATED_CONFLUENCE_OUTDATED: JIRA has new requirements but Confluence hasn't been updated
+- CONFLUENCE_UPDATED_JIRA_OUTDATED: Confluence has new requirements but JIRA hasn't been updated
+- JIRA_MORE_STRICT_THAN_CONFLUENCE: JIRA enforces stricter standards than Confluence
+- JIRA_vs_CONFLUENCE_PHILOSOPHY_MISMATCH: Fundamental disagreement on approach
+- JIRA_REQUIRES_CONFLUENCE_FORBIDS: Complete contradiction
+- SECURITY_MISMATCH: Security vulnerability due to misalignment
 """
 
 import json
@@ -36,6 +45,7 @@ class ValidationResult:
     severity: str
     notes: str
     recommendation: str = ""
+    conflict_type: str = ""
 
 
 class QADocumentationValidator:
@@ -107,7 +117,8 @@ class QADocumentationValidator:
                 status=AlignmentStatus(req.get('alignment_status', 'PARTIAL_MATCH')),
                 severity=req.get('severity', 'MEDIUM'),
                 notes=req.get('notes', ''),
-                recommendation=req.get('recommendation', '')
+                recommendation=req.get('recommendation', ''),
+                conflict_type=req.get('conflict_type', '')
             )
             self.results.append(result)
         
@@ -133,9 +144,9 @@ class QADocumentationValidator:
     
     def print_validation_summary(self) -> None:
         """Print formatted validation summary to console."""
-        print(f"\n{self.BOLD}{self.BLUE}{'='*70}{self.RESET}")
+        print(f"\n{self.BOLD}{self.BLUE}{'='*80}{self.RESET}")
         print(f"{self.BOLD}{self.BLUE}QA DOCUMENTATION VALIDATION REPORT{self.RESET}")
-        print(f"{self.BOLD}{self.BLUE}{'='*70}{self.RESET}\n")
+        print(f"{self.BOLD}{self.BLUE}{'='*80}{self.RESET}\n")
         
         # Print metadata
         print(f"{self.BOLD}JIRA Reference:{self.RESET}")
@@ -145,13 +156,16 @@ class QADocumentationValidator:
         print(f"  {self.metadata.get('confluence_link', 'N/A')}\n")
         
         print(f"{self.BOLD}{self.BLUE}REQUIREMENT VALIDATION RESULTS{self.RESET}")
-        print(f"{self.BLUE}{'-'*70}{self.RESET}\n")
+        print(f"{self.BLUE}{'-'*80}{self.RESET}\n")
         
         # Print each requirement result
         for result in self.results:
             icon = self._get_status_icon(result.status)
             status_text = result.status.value
             print(f"{icon} {result.req_id}: {result.name} – {status_text}")
+            
+            if result.conflict_type:
+                print(f"   {self.YELLOW}[{result.conflict_type}]{self.RESET}")
             
             if result.severity in ["CRITICAL", "HIGH"]:
                 severity_color = self._get_severity_color(result.severity)
@@ -178,7 +192,7 @@ class QADocumentationValidator:
         conflicts = sum(1 for r in self.results if r.status == AlignmentStatus.CONFLICT)
         
         print(f"{self.BOLD}{self.BLUE}VALIDATION SUMMARY{self.RESET}")
-        print(f"{self.BLUE}{'-'*70}{self.RESET}")
+        print(f"{self.BLUE}{'-'*80}{self.RESET}")
         print(f"Total Requirements: {total}")
         print(f"{self.GREEN}✔ Fully Matched: {matched} ({matched*100//total}%){self.RESET}")
         print(f"{self.YELLOW}⚠ Partially Matched: {partial} ({partial*100//total}%){self.RESET}")
@@ -195,6 +209,18 @@ class QADocumentationValidator:
             if high > 0:
                 print(f"  {self.YELLOW}High Priority Issues: {high}{self.RESET}")
             print()
+        
+        # Print conflict type breakdown
+        conflict_types = {}
+        for r in self.results:
+            if r.conflict_type:
+                conflict_types[r.conflict_type] = conflict_types.get(r.conflict_type, 0) + 1
+        
+        if conflict_types:
+            print(f"{self.BOLD}{self.RED}CONFLICT TYPE BREAKDOWN{self.RESET}")
+            for ctype, count in sorted(conflict_types.items()):
+                print(f"  • {ctype}: {count}")
+            print()
     
     def _print_action_items(self) -> None:
         """Print action items based on validation results."""
@@ -202,18 +228,30 @@ class QADocumentationValidator:
         partials = [r for r in self.results if r.status == AlignmentStatus.PARTIAL_MATCH]
         
         print(f"{self.BOLD}{self.BLUE}ACTION ITEMS{self.RESET}")
-        print(f"{self.BLUE}{'-'*70}{self.RESET}")
+        print(f"{self.BLUE}{'-'*80}{self.RESET}")
         
         if conflicts:
-            print(f"{self.RED}CONFLICTS DETECTED - IMMEDIATE ACTION REQUIRED:{self.RESET}")
+            print(f"{self.RED}CONFLICTS DETECTED - IMMEDIATE ACTION REQUIRED:{self.RESET}\n")
+            
+            # Group by conflict type
+            by_type = {}
             for conflict in conflicts:
-                print(f"  • {conflict.req_id}: {conflict.name}")
-                if conflict.recommendation:
-                    print(f"    → {conflict.recommendation}")
-            print()
+                ctype = conflict.conflict_type or "Unknown"
+                if ctype not in by_type:
+                    by_type[ctype] = []
+                by_type[ctype].append(conflict)
+            
+            for ctype, items in sorted(by_type.items()):
+                print(f"{self.RED}  [{ctype}]{self.RESET}")
+                for conflict in items:
+                    print(f"    • {conflict.req_id}: {conflict.name}")
+                    print(f"      Severity: {conflict.severity}")
+                    if conflict.recommendation:
+                        print(f"      → {conflict.recommendation}")
+                print()
         
         if partials:
-            print(f"{self.YELLOW}PARTIAL MATCHES - CLARIFICATION NEEDED:{self.RESET}")
+            print(f"{self.YELLOW}PARTIAL MATCHES - CLARIFICATION NEEDED:{self.RESET}\n")
             for partial in partials:
                 print(f"  • {partial.req_id}: {partial.name}")
                 if partial.recommendation:
@@ -223,11 +261,14 @@ class QADocumentationValidator:
         if not conflicts and not partials:
             print(f"{self.GREEN}✔ All requirements are aligned!{self.RESET}\n")
         else:
-            print(f"{self.BOLD}Next Steps:{self.RESET}")
-            print("  1. Review conflicts and prioritize resolution")
-            print("  2. Update Confluence documentation with JIRA specifications")
-            print("  3. Notify development team of requirement changes")
-            print("  4. Re-run validation after updates\n")
+            print(f"{self.BOLD}Recommended Resolution Steps:{self.RESET}")
+            print("  1. Categorize conflicts by type and severity")
+            print("  2. Schedule alignment meeting with JIRA and Confluence owners")
+            print("  3. Make decision: adopt JIRA spec or Confluence spec")
+            print("  4. Update both JIRA and Confluence with agreed specs")
+            print("  5. Notify development team of requirement changes")
+            print("  6. Update CI/CD pipeline to enforce new requirements")
+            print("  7. Re-run validation to confirm alignment\n")
     
     def generate_report(self, output_file: str = "validation_report.txt") -> None:
         """
@@ -238,24 +279,27 @@ class QADocumentationValidator:
         """
         with open(output_file, 'w') as f:
             f.write("QA DOCUMENTATION VALIDATION REPORT\n")
-            f.write("=" * 70 + "\n\n")
+            f.write("=" * 80 + "\n\n")
             
             f.write(f"JIRA Reference: {self.metadata.get('jira_link', 'N/A')}\n")
             f.write(f"Confluence Reference: {self.metadata.get('confluence_link', 'N/A')}\n")
-            f.write(f"Generated: {self.metadata.get('last_updated', 'N/A')}\n\n")
+            f.write(f"Generated: {self.metadata.get('last_updated', 'N/A')}\n")
+            f.write(f"Version: {self.metadata.get('version', 'N/A')}\n\n")
             
             for result in self.results:
-                f.write(f"\n{'-' * 70}\n")
+                f.write(f"\n{'-' * 80}\n")
                 f.write(f"Requirement: {result.req_id} - {result.name}\n")
                 f.write(f"Status: {result.status.value}\n")
                 f.write(f"Severity: {result.severity}\n")
+                if result.conflict_type:
+                    f.write(f"Conflict Type: {result.conflict_type}\n")
                 f.write(f"Notes: {result.notes}\n")
                 if result.recommendation:
                     f.write(f"Recommendation: {result.recommendation}\n")
             
-            f.write(f"\n{'=' * 70}\n")
+            f.write(f"\n{'=' * 80}\n")
             f.write("SUMMARY\n")
-            f.write(f"{'=' * 70}\n")
+            f.write(f"{'=' * 80}\n")
             
             total = len(self.results)
             matched = sum(1 for r in self.results if r.status == AlignmentStatus.MATCH)

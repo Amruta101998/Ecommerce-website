@@ -2,9 +2,11 @@
   "metadata": {
     "jira_link": "https://bito.atlassian.net/browse/BITO-12071",
     "confluence_link": "https://bito.atlassian.net/wiki/spaces/EN/pages/1132003418/Quality+Assurance+QA",
-    "last_updated": "2026-02-03",
-    "version": "1.0.0",
-    "purpose": "QA Documentation Validation - JIRA vs Confluence Alignment Test"
+    "last_updated": "2026-02-04",
+    "version": "2.0.0",
+    "purpose": "QA Documentation Validation - JIRA vs Confluence Alignment Test",
+    "conflict_scenarios": "Multiple real-world documentation drift scenarios added",
+    "total_test_cases": 10
   },
   "requirements": [
     {
@@ -125,18 +127,163 @@
       "severity": "MEDIUM",
       "notes": "Both require encryption in transit, but JIRA provides detailed specifications (TLS 1.2+, ECDHE, HSTS, certificate validation) while Confluence only mentions 'HTTPS'. Implementation needs to follow JIRA's detailed requirements.",
       "recommendation": "Update Confluence with specific TLS version, cipher suite, and HSTS requirements from JIRA. Add certificate validation requirements."
+    },
+    {
+      "id": "REQ-006",
+      "category": "Database",
+      "name": "Database Connection Pooling",
+      "jira_specification": {
+        "source": "BITO-12071 (UPDATED 2026-02-04)",
+        "details": "Database connection pool size must be set to MINIMUM 20 connections. Maximum pool size should be 100 connections. Connection timeout: 30 seconds. Idle timeout: 900 seconds (15 minutes). Pool must use HikariCP driver.",
+        "min_pool_size": 20,
+        "max_pool_size": 100,
+        "connection_timeout": "30 seconds",
+        "idle_timeout": "900 seconds",
+        "driver": "HikariCP",
+        "last_updated_jira": "2026-02-04"
+      },
+      "confluence_specification": {
+        "source": "Quality Assurance QA (OUTDATED)",
+        "details": "Database connection pool size should be set to 10 connections minimum. Maximum pool size should be 50 connections. Standard connection timeout recommended. Uses C3P0 connection pooling library.",
+        "min_pool_size": 10,
+        "max_pool_size": 50,
+        "connection_timeout": "Not specified",
+        "driver": "C3P0",
+        "last_updated_confluence": "2025-11-15"
+      },
+      "alignment_status": "CONFLICT",
+      "confidence": 100,
+      "severity": "CRITICAL",
+      "notes": "CRITICAL MISMATCH: JIRA was recently updated (2026-02-04) with new requirements but Confluence has NOT been updated. JIRA now requires HikariCP (modern, faster) while Confluence still references C3P0 (deprecated). Pool sizes conflict: JIRA min=20/max=100 vs Confluence min=10/max=50. This will cause production issues if Confluence specs are followed.",
+      "recommendation": "URGENT: Update Confluence to reflect JIRA changes. Migrate from C3P0 to HikariCP. Update pool sizes to min=20, max=100. Add connection timeout specification.",
+      "conflict_type": "JIRA_UPDATED_CONFLUENCE_OUTDATED"
+    },
+    {
+      "id": "REQ-007",
+      "category": "Logging",
+      "name": "Application Logging Configuration",
+      "jira_specification": {
+        "source": "BITO-12071",
+        "details": "All application logs must be sent to file system with rotation every 24 hours. Log level: INFO for production. Log format must include timestamp, thread ID, and stack trace for errors. Logs retained for 30 days.",
+        "log_destination": "File system",
+        "rotation_period": "24 hours",
+        "log_level": "INFO",
+        "retention_days": 30
+      },
+      "confluence_specification": {
+        "source": "Quality Assurance QA (RECENTLY CHANGED)",
+        "details": "All logs must be centralized to ELK stack (Elasticsearch, Logstash, Kibana). Log level should be DEBUG for better visibility. Logs should be retained for 90 days for compliance. Real-time log streaming required.",
+        "log_destination": "ELK stack (Elasticsearch)",
+        "rotation_period": "Not applicable",
+        "log_level": "DEBUG",
+        "retention_days": 90,
+        "real_time_streaming": true
+      },
+      "alignment_status": "CONFLICT",
+      "confidence": 100,
+      "severity": "HIGH",
+      "notes": "MAJOR ARCHITECTURAL CONFLICT: JIRA requires file-based logging while Confluence specifies ELK stack (cloud-based). Log level mismatch: JIRA=INFO vs Confluence=DEBUG. Retention mismatch: JIRA=30 days vs Confluence=90 days. This represents two completely different logging architectures. Confluence change appears recent and not communicated to JIRA owner.",
+      "recommendation": "Urgent alignment meeting required. Decision needed: File-based or ELK stack? If ELK chosen, update JIRA. If file-based chosen, update Confluence. Clarify log level and retention requirements.",
+      "conflict_type": "CONFLUENCE_UPDATED_JIRA_OUTDATED"
+    },
+    {
+      "id": "REQ-008",
+      "category": "Testing",
+      "name": "Unit Test Code Coverage",
+      "jira_specification": {
+        "source": "BITO-12071",
+        "details": "Minimum code coverage requirement is 75% for all new code. All critical paths must have 100% coverage. Coverage reports must be generated with each build. Tools: JaCoCo for Java, Istanbul for JavaScript.",
+        "minimum_coverage": "75%",
+        "critical_paths_coverage": "100%",
+        "tools": "JaCoCo (Java), Istanbul (JavaScript)"
+      },
+      "confluence_specification": {
+        "source": "Quality Assurance QA",
+        "details": "Code coverage should be maintained above 60%. Coverage reports are optional. Any coverage tool can be used.",
+        "minimum_coverage": "60%",
+        "coverage_reports": "Optional",
+        "tools": "Any tool acceptable"
+      },
+      "alignment_status": "CONFLICT",
+      "confidence": 100,
+      "severity": "HIGH",
+      "notes": "QUALITY STANDARD CONFLICT: JIRA enforces stricter 75% minimum coverage (vs Confluence 60%). JIRA requires 100% coverage for critical paths, Confluence doesn't mention this. JIRA mandates specific tools (JaCoCo, Istanbul), Confluence allows any tool. JIRA requires coverage reports with each build, Confluence makes them optional. These differences will impact code quality metrics.",
+      "recommendation": "Adopt JIRA's stricter standards (75% minimum, 100% critical, specific tools). Update Confluence. Make coverage reports mandatory in CI/CD pipeline.",
+      "conflict_type": "JIRA_MORE_STRICT_THAN_CONFLUENCE"
+    },
+    {
+      "id": "REQ-009",
+      "category": "Deployment",
+      "name": "Production Deployment Process",
+      "jira_specification": {
+        "source": "BITO-12071",
+        "details": "Deployments must occur during maintenance window (2-4 AM UTC). Maximum 2 deployments per week. Rollback plan must be documented before deployment. Blue-green deployment strategy required.",
+        "deployment_window": "2-4 AM UTC",
+        "max_deployments_per_week": 2,
+        "rollback_plan": "Required",
+        "strategy": "Blue-green"
+      },
+      "confluence_specification": {
+        "source": "Quality Assurance QA (UPDATED 2026-02-01)",
+        "details": "Deployments should follow continuous deployment model. Multiple deployments per day are acceptable. Canary deployment strategy is preferred for gradual rollout. Automatic rollback on failure.",
+        "deployment_window": "Any time",
+        "max_deployments_per_week": "Unlimited",
+        "strategy": "Canary deployment",
+        "automatic_rollback": true
+      },
+      "alignment_status": "CONFLICT",
+      "confidence": 100,
+      "severity": "CRITICAL",
+      "notes": "FUNDAMENTAL PROCESS CONFLICT: JIRA enforces conservative deployment (2x/week, scheduled window) while Confluence advocates aggressive deployment (continuous, any time). Deployment strategy differs: JIRA=Blue-green vs Confluence=Canary. This represents a fundamental disagreement on deployment philosophy. Confluence change on 2026-02-01 was not synchronized with JIRA.",
+      "recommendation": "Executive decision required on deployment cadence. If continuous deployment chosen, update JIRA and implement canary deployment. If conservative approach chosen, enforce JIRA specs and update Confluence. Establish deployment governance.",
+      "conflict_type": "JIRA_vs_CONFLUENCE_PHILOSOPHY_MISMATCH"
+    },
+    {
+      "id": "REQ-010",
+      "category": "API",
+      "name": "API Rate Limiting",
+      "jira_specification": {
+        "source": "BITO-12071",
+        "details": "Rate limiting must be implemented at 1000 requests per minute per IP address. Burst limit: 100 requests per second. Response header must include X-RateLimit-Remaining. Exponential backoff required for clients.",
+        "requests_per_minute": 1000,
+        "burst_limit": "100 per second",
+        "response_header": "X-RateLimit-Remaining required",
+        "client_backoff": "Exponential"
+      },
+      "confluence_specification": {
+        "source": "Quality Assurance QA",
+        "details": "No rate limiting is currently required. API endpoints should be accessible without throttling restrictions. Future rate limiting may be implemented based on usage patterns.",
+        "rate_limiting": "Not required",
+        "future_consideration": true
+      },
+      "alignment_status": "CONFLICT",
+      "confidence": 100,
+      "severity": "CRITICAL",
+      "notes": "COMPLETE CONTRADICTION: JIRA mandates rate limiting (1000 req/min, 100 burst/sec) while Confluence explicitly states 'NO rate limiting required'. This is a critical security and performance conflict. If Confluence specs are followed, API will be vulnerable to DDoS attacks and resource exhaustion.",
+      "recommendation": "IMMEDIATE ACTION: Implement JIRA's rate limiting requirements. Update Confluence to reflect rate limiting as mandatory. Add DDoS protection measures. Implement monitoring for rate limit violations.",
+      "conflict_type": "JIRA_REQUIRES_CONFLUENCE_FORBIDS"
     }
   ],
   "summary": {
-    "total_requirements": 5,
+    "total_requirements": 10,
     "fully_matched": 2,
     "partially_matched": 2,
-    "conflicts": 1,
-    "match_percentage": 40,
-    "partial_match_percentage": 40,
-    "conflict_percentage": 20,
-    "critical_issues": 1,
-    "high_priority_issues": 1,
-    "action_required": true
+    "conflicts": 6,
+    "match_percentage": 20,
+    "partial_match_percentage": 20,
+    "conflict_percentage": 60,
+    "critical_issues": 4,
+    "high_priority_issues": 2,
+    "action_required": true,
+    "conflict_breakdown": {
+      "jira_updated_confluence_outdated": 1,
+      "confluence_updated_jira_outdated": 1,
+      "jira_more_strict": 1,
+      "fundamental_philosophy_mismatch": 1,
+      "jira_requires_confluence_forbids": 1,
+      "security_mismatch": 1
+    },
+    "risk_assessment": "HIGH - Multiple critical conflicts detected. Production deployment at risk if not resolved.",
+    "estimated_resolution_time": "3-5 business days"
   }
 }
