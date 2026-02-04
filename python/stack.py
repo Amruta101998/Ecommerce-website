@@ -36,6 +36,8 @@ def evaluate_postfix(expression):
             operand1 = stack.pop()
             result = operators[char](operand1, operand2)
             stack.push(result)
+        else:
+            raise ValueError(f"Invalid token: {char}")
 
     return stack.pop()
 
