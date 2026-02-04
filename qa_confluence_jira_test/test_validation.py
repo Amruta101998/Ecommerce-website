@@ -307,9 +307,9 @@ class QADocumentationValidator:
             conflicts = sum(1 for r in self.results if r.status == AlignmentStatus.CONFLICT)
             
             f.write(f"Total Requirements: {total}\n")
-            f.write(f"Fully Matched: {matched} ({matched*100//total}%)\n")
-            f.write(f"Partially Matched: {partial} ({partial*100//total}%)\n")
-            f.write(f"Conflicts: {conflicts} ({conflicts*100//total}%)\n")
+            f.write(f"Fully Matched: {matched} ({matched*100//total if total > 0 else 0}%)\n")
+            f.write(f"Partially Matched: {partial} ({partial*100//total if total > 0 else 0}%)\n")
+            f.write(f"Conflicts: {conflicts} ({conflicts*100//total if total > 0 else 0}%)\n")
     
     def get_exit_code(self) -> int:
         """
