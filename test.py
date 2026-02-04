@@ -46,8 +46,8 @@ def error_handler(func):
             return f"Error: {str(e)}"
         except OverflowError:
             return "Error: Numerical overflow"
-        except Exception as e:
-            return f"Error: {type(e).__name__}: {str(e)}"
+        except (ValueError, TypeError, AttributeError, OverflowError) as e:
+            return f"Error: {type(e).__name__}: {e!s}"
     return wrapper
 
 def validate_input(func):
