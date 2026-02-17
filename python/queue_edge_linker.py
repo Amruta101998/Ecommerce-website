@@ -112,7 +112,7 @@ class EdgeLinker:
             queue_map[edge.queue_identifier].append(edge)
         
         # Create links between producer and consumer
-        for queue_id, queue_edges in queue_map.items():
+            for queue_edges in queue_map.values():
             producers = [e for e in queue_edges if e.operation_type == "produce"]
             consumers = [e for e in queue_edges if e.operation_type == "consume"]
             
