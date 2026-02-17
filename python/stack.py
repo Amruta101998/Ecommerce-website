@@ -26,7 +26,12 @@ class Stack:
 
 def evaluate_postfix(expression):
     stack = Stack()
-    operators = {'+': lambda x, y: x + y, '-': lambda x, y: x - y, '*': lambda x, y: x * y, '/': lambda x, y: x / y}
+    operators = {
+        '+': lambda x, y: x + y,
+        '-': lambda x, y: x - y,
+        '*': lambda x, y: x * y,
+        '/': lambda x, y: x / y
+    }
 
     for char in expression.split():
         if char.isdigit():
