@@ -194,9 +194,9 @@ class QADocumentationValidator:
         print(f"{self.BOLD}{self.BLUE}VALIDATION SUMMARY{self.RESET}")
         print(f"{self.BLUE}{'-'*80}{self.RESET}")
         print(f"Total Requirements: {total}")
-        print(f"{self.GREEN}✔ Fully Matched: {matched} ({matched*100//total}%){self.RESET}")
-        print(f"{self.YELLOW}⚠ Partially Matched: {partial} ({partial*100//total}%){self.RESET}")
-        print(f"{self.RED}✖ Conflicts: {conflicts} ({conflicts*100//total}%){self.RESET}\n")
+        print(f"{self.GREEN}✔ Fully Matched: {matched} ({matched*100//total if total > 0 else 0}%){self.RESET}")
+        print(f"{self.YELLOW}⚠ Partially Matched: {partial} ({partial*100//total if total > 0 else 0}%){self.RESET}")
+        print(f"{self.RED}✖ Conflicts: {conflicts} ({conflicts*100//total if total > 0 else 0}%){self.RESET}\n")
         
         # Print severity breakdown
         critical = sum(1 for r in self.results if r.severity == "CRITICAL")
