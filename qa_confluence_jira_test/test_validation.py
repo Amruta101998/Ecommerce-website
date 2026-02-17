@@ -359,7 +359,7 @@ def main() -> int:
     except json.JSONDecodeError as e:
         print(f"{validator.RED}JSON Error: {e}{validator.RESET}", file=sys.stderr)
         return 1
-    except Exception as e:
+    except (FileNotFoundError, json.JSONDecodeError) as e:
         print(f"{validator.RED}Unexpected error: {e}{validator.RESET}", file=sys.stderr)
         return 1
 
