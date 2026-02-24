@@ -113,7 +113,7 @@ class QueueEdgeDetector:
             edges.extend(self._detect_sqs(content, service_name, file_path))
             edges.extend(self._detect_generic_queues(content, service_name, file_path))
             
-        except Exception as e:
+        except (IOError, OSError, UnicodeDecodeError) as e:
             print(f"Error processing file {file_path}: {str(e)}")
         
         return edges
