@@ -113,15 +113,15 @@ class EdgeLinker:
         
         # Create links between producer and consumer
             for queue_edges in queue_map.values():
-            producers = [e for e in queue_edges if e.operation_type == "produce"]
-            consumers = [e for e in queue_edges if e.operation_type == "consume"]
-            
-            for producer in producers:
-                for consumer in consumers:
-                    if producer.source_identifier != consumer.source_identifier:
-                        self.link_queue_call(producer.edge_id, consumer.edge_id)
-                        stats["links_created"] += 1
-                        stats["linked_edges"] += 1
+                producers = [e for e in queue_edges if e.operation_type == "produce"]
+                consumers = [e for e in queue_edges if e.operation_type == "consume"]
+                
+                for producer in producers:
+                    for consumer in consumers:
+                        if producer.source_identifier != consumer.source_identifier:
+                            self.link_queue_call(producer.edge_id, consumer.edge_id)
+                            stats["links_created"] += 1
+                            stats["linked_edges"] += 1
         
         return stats
     
