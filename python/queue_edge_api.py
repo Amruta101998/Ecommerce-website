@@ -6,11 +6,13 @@ This module provides integration with the ai-architect API for syncing queue edg
 """
 
 import json
-import requests
+import logging
 from typing import Dict, List, Optional, Any
+
+import requests
+
 from queue_edge_model import QueueEdge, QueueEdgeCollection
 from queue_edge_linker import EdgeLinker, QueueEdgeIndexer
-import logging
 
 
 # Configure logging
