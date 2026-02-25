@@ -11,6 +11,12 @@ class TaskManager:
         self.task_id_counter += 1
 
     def get_next_task(self):
+        """Retrieve and remove the highest priority task from the queue.
+        
+        Returns:
+            tuple: A tuple of (priority, task_id, description) for the next task,
+                   or None if the queue is empty.
+        """
         if self.tasks:
             return heapq.heappop(self.tasks)
         else:
