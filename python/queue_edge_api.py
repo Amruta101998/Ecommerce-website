@@ -337,7 +337,7 @@ class QueueEdgeIndexSync:
             return stats
         
         except Exception as e:
-            logger.error(f"Sync to API failed: {str(e)}")
+            logger.exception("Sync to API failed: %s", e)
             return {
                 "synced": False,
                 "error": str(e)
