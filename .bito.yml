@@ -1,0 +1,31 @@
+custom_guidelines:
+  general:
+    - name: "code review checklist"
+      path: "/Customguideline/code_review _checklist.pdf"
+  per_language:
+    objective_C:
+      name: "objective_C Coding Standards"
+      path: "/Customguideline/objective_C.txt"
+    javascript:  
+      name: "javascript"
+      path: "/Customguideline/javascript_without_extension"
+    typescript:  
+      name: "typescript repo level"
+      path: "/Customguideline/typescript.log"
+    python:  
+      name: "Python repo level "
+      path: "/Customguideline/python_without_extension"  
+    md:
+      name: "Markdown repo level "
+      path: "/Customguideline/markdown.md"   
+
+dependency_check.enabled: true
+exclude_draft_pr: false
+exclude_files: "*.xml, *.json, *.properties, .gitignore, *.yml"
+include_source_branches: "*"
+include_target_branches: "*"
+linters_feedback: true
+post_changelist: true
+post_description: true
+secret_scanner_feedback: true
+suggestion_mode: essential

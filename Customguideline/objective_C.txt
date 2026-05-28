@@ -1,0 +1,102 @@
+1. Code Style & Consistency
+Follow Apple’s naming conventions:
+
+Classes & Protocols: PascalCase (e.g., MyViewController).
+
+Methods: camelCase (e.g., viewDidLoad, calculateTotalPrice:).
+
+Variables: camelCase (e.g., userName, totalCount).
+
+Constants: kPascalCase or UPPER_CASE (e.g., kMaxRetryCount, DEFAULT_TIMEOUT).
+
+Use spaces over tabs (align with Xcode defaults).
+
+Indent with 4 spaces (or match project settings).
+
+Limit line length to 100 characters.
+
+2. Memory Management (Manual & ARC)
+Under Manual Retain-Release (MRR):
+
+Always balance retain/release/autorelease.
+
+Follow ownership rules (e.g., init, copy, new methods return retained objects).
+
+Under ARC:
+
+Use weak for delegate references to avoid retain cycles.
+
+Use strong for object ownership.
+
+Avoid unsafe_unretained unless necessary (prefer weak).
+
+3. Error Handling & Defensive Coding
+Use NSError ** pattern for recoverable errors:
+
+objc
+NSError *error;  
+if (![self doSomethingWithError:&error]) {  
+    NSLog(@"Error: %@", error.localizedDescription);  
+}  
+Validate inputs in public methods (e.g., check for nil).
+
+Use NSAssert/NSCAssert for internal sanity checks (removed in release builds).
+
+4. Performance & Optimization
+Cache expensive operations (e.g., UITableViewCell reuse).
+
+Prefer immutable objects (NSArray, NSDictionary) where possible.
+
+Use @autoreleasepool blocks in loops with many temporary objects.
+
+Avoid block retain cycles with __weak references:
+
+objc
+__weak typeof(self) weakSelf = self;  
+[self doSomethingWithCompletion:^{  
+    __strong typeof(weakSelf) strongSelf = weakSelf;  
+    [strongSelf updateUI];  
+}];  
+5. Modern Objective-C Features
+Use property syntax (@property) instead of manual getters/setters.
+
+Prefer NS_ENUM & NS_OPTIONS over raw enums:
+
+objc
+typedef NS_ENUM(NSInteger, ConnectionState) {  
+    ConnectionStateDisconnected,  
+    ConnectionStateConnecting,  
+    ConnectionStateConnected  
+};  
+Use object literals where possible:
+
+objc
+NSArray *array = @[obj1, obj2];  
+NSDictionary *dict = @{@"key": value};  
+6. Thread Safety & Concurrency
+Use @synchronized for critical sections (but prefer dispatch_queue for performance).
+
+Prefer Grand Central Dispatch (GCD) over NSThread:
+
+objc
+dispatch_async(dispatch_get_global_queue(QOS_CLASS_BACKGROUND, 0), ^{  
+    // Background work  
+    dispatch_async(dispatch_get_main_queue(), ^{  
+        // Update UI  
+    });  
+});  
+Avoid locking on self (can cause deadlocks).
+
+7. Security & Safety
+Sanitize user inputs (e.g., SQL injection, XSS in UIWebView).
+
+Avoid hardcoded secrets (use Keychain Services).
+
+Use NSFileManager instead of POSIX file ops for sandbox compatibility.
+
+8. Maintainability & Testing
+Document public APIs with /// comments (supports Xcode Quick Help).
+
+Write unit tests (XCTest).
+
+Avoid long methods (split into helper methods).
