@@ -7,13 +7,14 @@ API integration, and edge detection capabilities.
 """
 
 import heapq
-from typing import Dict, List, Optional, Any, Callable
+import logging
 from datetime import datetime
+from typing import Dict, List, Optional, Any, Callable
+
 from queue_edge_model import QueueEdge, QueueEdgeCollection, create_queue_edge
 from queue_edge_detector import QueueEdgeDetector
 from queue_edge_linker import EdgeLinker
 from queue_edge_api import QueueEdgeIntegrationManager
-import logging
 
 
 logging.basicConfig(level=logging.INFO)

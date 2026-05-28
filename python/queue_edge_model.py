@@ -100,16 +100,16 @@ class QueueEdge:
         """Convert edge to JSON string"""
         return json.dumps(self.to_dict(), indent=2)
     
-    @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> 'QueueEdge':
-        """Create QueueEdge from dictionary"""
-        # Handle nested objects
-        if 'request' in data and data['request']:
-            data['request'] = QueueEdgeRequest(**data['request'])
-        if 'response' in data and data['response']:
-            data['response'] = QueueEdgeResponse(**data['response'])
-        
-        return cls(**data)
+def from_dict(cls, data: Dict[str, Any]) -> 'QueueEdge':
+    """Create QueueEdge from dictionary"""
+    data = dict(data)
+    # Handle nested objects
+    if 'request' in data and data['request']:
+        data['request'] = QueueEdgeRequest(**data['request'])
+    if 'response' in data and data['response']:
+        data['response'] = QueueEdgeResponse(**data['response'])
+
+    return cls(**data)
 
 
 @dataclass
