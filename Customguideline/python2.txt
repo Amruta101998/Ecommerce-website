@@ -1,0 +1,220 @@
+# Python code review checklist
+
+### Code layout
+
+- Use 4 spaces per indentation level (no tabs).
+- Limit lines to 79 characters (comments/docstrings ≤72).
+- Surround top-level function and class definitions with two blank lines.
+- Surround method definitions inside a class with one blank line.
+
+### Imports
+
+- One import per line.
+- Group imports in this order:
+  1. Standard library imports
+  2. Third-party imports
+  3. Local application/library imports
+- Use absolute imports unless relative imports improve readability.
+- Avoid wildcard imports (`from module import *`).
+
+### Whitespace and formatting
+
+- No extra spaces inside parentheses, brackets, or braces.
+
+  Correct:
+  ```python
+  spam(ham[1], {eggs: 2})
+  ```
+
+  Incorrect:
+  ```python
+  spam( ham[ 1 ], { eggs: 2 } )
+  ```
+
+- No spaces before a comma, semicolon, or colon.
+- No spaces before the open parenthesis of a function call.
+- No spaces before the open parenthesis of an indexing or slicing operation.
+- No spaces around `=` in keyword arguments.
+
+  Correct:
+  ```python
+  def func(x=42):
+      pass
+  ```
+
+  Incorrect:
+  ```python
+  def func(x = 42):
+      pass
+  ```
+
+- Binary operators (`+`, `-`, `*`, etc.) should break **before**, not after.
+
+  Correct:
+  ```python
+  total = (gross_wages
+           + taxable_interest
+           - deductions)
+  ```
+
+  Incorrect:
+  ```python
+  total = (gross_wages +
+           taxable_interest +
+           deductions)
+  ```
+
+- Use trailing commas where useful.
+
+  Correct:
+  ```python
+  FILES = [
+      'setup.cfg',
+      'tox.ini',
+  ]
+  ```
+
+  Incorrect:
+  ```python
+  FILES = ['setup.cfg', 'tox.ini',]
+  ```
+
+### Naming conventions
+
+- Variables and functions use `lower_case_with_underscores`.
+- Classes use `CapWords`.
+- Constants use `ALL_CAPS_WITH_UNDERSCORES`.
+- Non-public methods and variables use `_single_leading_underscore`.
+- Avoid single-character names like `l`, `O`, `I` (confusing with `1` and `0`).
+
+### Comments and docstrings
+
+- Write docstrings for all public modules, functions, classes, and methods.
+- One-liner docstrings stay on one line.
+- Multiline docstrings use triple quotes.
+
+  Correct:
+  ```python
+  """Summary line.
+
+  More explanation if needed.
+  """
+  ```
+
+- Block comments start with `#` and a space.
+
+### Best practices
+
+- Avoid unnecessary inline statements.
+
+  Correct:
+  ```python
+  if foo == 'bar':
+      do_something()
+  ```
+
+  Incorrect:
+  ```python
+  if foo == 'bar': do_something()
+  ```
+
+- Use `with` for resource management.
+
+  Correct:
+  ```python
+  with open("file.txt") as f:
+      data = f.read()
+  ```
+
+  Incorrect:
+  ```python
+  f = open("file.txt")
+  data = f.read()
+  f.close()
+  ```
+
+- Use `is` / `is not` for `None` comparisons, not `==`.
+
+  Correct:
+  ```python
+  if my_var is None:
+      pass
+  ```
+
+  Incorrect:
+  ```python
+  if my_var == None:
+      pass
+  ```
+
+- Use `startswith()` and `endswith()` instead of slicing.
+
+  Correct:
+  ```python
+  if filename.startswith("data_"):
+  ```
+
+  Incorrect:
+  ```python
+  if filename[:5] == "data_":
+  ```
+
+- Use `isinstance()` instead of `type() ==` for type checks.
+
+  Correct:
+  ```python
+  if isinstance(obj, int):
+  ```
+
+  Incorrect:
+  ```python
+  if type(obj) is int:
+  ```
+
+- Use `try...finally` or `with` for cleanup instead of a bare `except:`.
+
+  Correct:
+  ```python
+  try:
+      process_data()
+  except ValueError:
+      print("Invalid data")
+  ```
+
+  Incorrect:
+  ```python
+  try:
+      process_data()
+  except:
+      print("Something went wrong")
+  ```
+
+- Use `def` instead of `lambda` for assigned functions.
+
+  Correct:
+  ```python
+  def double(x):
+      return 2 * x
+  ```
+
+  Incorrect:
+  ```python
+  double = lambda x: 2 * x
+  ```
+
+- Use explicit return values for consistency.
+
+  Correct:
+  ```python
+  def example(x):
+      if x:
+          return 42
+      return None  # Explicitly returns None
+  ```
+
+  Incorrect:
+  ```python
+  def example(x):
+      if x:
+          return 42
+  ```
