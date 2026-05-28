@@ -401,7 +401,7 @@ class QueueEdgeIntegrationManager:
             # Sync to API
             results["sync_stats"] = self.sync.sync_to_api(collection)
             
-        except requests.exceptions.RequestException as e:
+        except Exception as e:
             logger.error(f"Processing failed: {str(e)}")
             results["errors"].append(str(e))
         
