@@ -1,4 +1,10 @@
 class Stack:
+    """A simple stack data structure implementation using a list.
+
+    This class provides basic stack operations: push, pop, peek, and size.
+    It follows the LIFO (Last In, First Out) principle.
+    """
+
     def __init__(self):
         self.items = []
 
