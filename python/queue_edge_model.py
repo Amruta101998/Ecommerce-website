@@ -203,10 +203,10 @@ class QueueEdgeSchema:
         "required": ["edge_id", "source_identifier", "queue_identifier", "operation_type"]
     }
     
-    @staticmethod
     def validate_edge(edge: Dict[str, Any]) -> bool:
         """
-        Validate edge against schema
+        Check that all required fields are present.
+        Note: QUEUE_EDGE_SCHEMA is available for full schema validation if jsonschema is installed.
         Returns True if valid, False otherwise
         """
         required_fields = ["edge_id", "source_identifier", "queue_identifier", "operation_type"]
